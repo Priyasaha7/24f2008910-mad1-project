@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Summary - SmartPark</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js for dashboard charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: #0c1a27;
+            font-family: 'Inter', sans-serif;
+            color: #e8eaf6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .dashboard-header {
+            max-width: 1100px;
+            margin: 2rem auto 1rem auto;
+            padding: 2rem 2rem 1rem 2rem;
+            background: rgba(22, 24, 43, 0.6);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+        }
+        .page-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+            color: #e8eaf6;
+        }
+        .page-subtitle {
+            color: #9fa8da;
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+        .charts-section {
+            margin: 3rem 0 2rem 0;
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 320px;
+            margin: 0 auto 2rem auto;
+            background: rgba(22, 24, 43, 0.6);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 4px 16px 0 rgba(31,38,135,0.10);
+            transition: box-shadow 0.2s;
+        }
+        .chart-container:hover {
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+        }
+        .chart-title {
+            color: #c5cae9;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            text-align: center;
+            letter-spacing: 0.01em;
+        }
+        @media (max-width: 700px) {
+            .chart-container { max-width: 100%; height: 220px;}
+            .charts-section { padding: 0 1rem;}
+        }
+        .row.stats-container {
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .stat-card {
+            background: rgba(22, 24, 43, 0.6);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s;
+            box-shadow: 0 4px 16px 0 rgba(31,38,135,0.10);
+        }
+        .stat-card:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+        }
+        .stat-card .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #c5cae9;
+            margin-bottom: 1.2rem;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .stat-label {
+            display: block;
+            font-size: 0.85rem;
+            color: #9fa8da;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.01em;
+        }
+        .stat-value {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #e8eaf6;
+            letter-spacing: 0.01em;
+        }
+        .recent-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .recent-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed rgba(255,255,255,0.1);
+        }
+        .recent-list li:last-child {
+            border-bottom: none;
+        }
+        .activity-feed {
+            background: rgba(0, 2, 24, 0.6);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin: 2rem auto 2rem auto;
+            max-width: 1100px;
+            box-shadow: 0 4px 16px 0 rgba(31,38,135,0.10);
+        }
+        .activity-feed .chart-title {
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .activity-item:last-child { border-bottom: none;}
+        .activity-icon {
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+        }
+        .activity-icon.success { background: rgba(76, 175, 80, 0.2); color: #4caf50;}
+        .activity-icon.warning { background: rgba(255, 152, 0, 0.2); color: #ff9800;}
+        .activity-icon.info { background: rgba(33, 150, 243, 0.2); color: #2196f3;}
+        .activity-content { flex: 1;}
+        .activity-title { color: #e8eaf6; font-weight: 500; margin-bottom: 0.25rem;}
+        .activity-time { color: #9fa8da; font-size: 0.875rem;}
+        @media (max-width: 768px) {
+            .dashboard-header { margin: 1rem; padding: 1.5rem;}
+            .charts-section { padding: 0 1rem;}
+            .row.stats-container { padding: 0 1rem;}
+            .activity-feed { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Summary Dashboard -->
+    <div class="dashboard-header">
+        <h2 class="page-title"><i class="fas fa-chart-pie me-2"></i>System Summary</h2>
+        <p class="page-subtitle">Key metrics and statistics overview</p>
+
+<div class="d-flex justify-content-end mb-3" style="max-width:1100px;margin:0 auto;">
+    <a href="{{ url_for('admin.index') }}" 
+       class="btn"
+       style="background: linear-gradient(90deg, #0d141c 0%, #17243b 100%); color: #fff; ">
+        <i class="fas fa-arrow-left me-2"></i>
+            Back to Dashboard
+    </a>
+</div>
+
+
+    </div>
+    <div class="row stats-container mb-4">
+        <!-- User Stats -->
+        <div class="col-md-6 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-users me-2"></i>User Statistics</h5>
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Users</span>
+                            <span class="stat-value">{{ total_users }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Admins</span>
+                            <span class="stat-value">{{ total_admins }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">New Users (Week)</span>
+                            <span class="stat-value">{{ new_users_week }}</span>
+                        </div>
+                    </div>
+                    <h6 class="mt-3 text-light">Recent Registrations:</h6>
+                    <ul class="recent-list text-secondary">
+                        {% for user in recent_users %}
+                        <li>{{ user.full_name }} <small>({{ user.registered_on.strftime('%Y-%m-%d') }})</small></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- Parking Stats -->
+        <div class="col-md-6 mb-3">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-parking me-2"></i>Parking Statistics</h5>
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Parking Lots</span>
+                            <span class="stat-value">{{ total_lots }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Total Spots</span>
+                            <span class="stat-value">{{ total_spots }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Available</span>
+                            <span class="stat-value">{{ available_spots }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Occupied</span>
+                            <span class="stat-value">{{ occupied_spots }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Inactive</span>
+                            <span class="stat-value">{{ inactive_spots }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Full Lots</span>
+                            <span class="stat-value">{{ full_lots }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Reservation Stats -->
+        <div class="col-12">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-calendar-check me-2"></i>Reservation Statistics</h5>
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Reservations</span>
+                            <span class="stat-value">{{ total_reservations }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Active</span>
+                            <span class="stat-value">{{ active_reservations }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Released</span>
+                            <span class="stat-value">{{ released_reservations }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Expired</span>
+                            <span class="stat-value">{{ expired_reservations }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Avg. Duration</span>
+                            <span class="stat-value">
+                                {% if avg_duration %}
+                                    {{ avg_duration.seconds//60 }} mins
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Avg. Cost</span>
+                            <span class="stat-value">
+                                {% if avg_cost %}
+                                    ₹{{ '%.2f'|format(avg_cost) }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Bookings by Parking Lot
+                    </h3>
+                    <canvas id="lotBookingsChart"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        Spot Status Overview
+                    </h3>
+                    <canvas id="spotStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="chart-container">
+            <h3 class="chart-title">
+                <i class="fas fa-chart-line me-2"></i>
+                Revenue Trends (Last 7 Days)
+            </h3>
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Activity Feed -->
+    <div class="activity-feed">
+        <h3 class="chart-title">
+            <i class="fas fa-clock me-2"></i>
+            Recent System Activity
+        </h3>
+        {% if recent_activities %}
+            {% for activity in recent_activities %}
+            <div class="activity-item">
+                <div class="activity-icon {{ activity.icon_class }}">
+                    <i class="{{ activity.icon }}"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">{{ activity.title }}</div>
+                    <div class="activity-time">{{ activity.time }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-info-circle fa-2x mb-3" style="color: #7986cb;"></i>
+                <p>No recent activity</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        Chart.defaults.color = '#c5cae9';
+        Chart.defaults.borderColor = 'rgba(255,255,255,0.1)';
+        
+        // Chart data from backend - same as index.html
+        const lotBookingsData = {
+            labels: {{ lot_names | tojson | safe }},
+            datasets: [{
+                label: 'Bookings',
+                data: {{ lot_bookings | tojson | safe }},
+                backgroundColor: [
+                    'rgba(255, 107, 107, 0.8)',
+                    'rgba(255, 217, 61, 0.8)', 
+                    'rgba(66, 165, 245, 0.8)',
+                    'rgba(102, 187, 106, 0.8)',
+                    'rgba(171, 71, 188, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(255, 107, 107, 1)',
+                    'rgba(255, 217, 61, 1)',
+                    'rgba(66, 165, 245, 1)',
+                    'rgba(102, 187, 106, 1)',
+                    'rgba(171, 71, 188, 1)'
+                ],
+                borderWidth: 2
+            }]
+        };
+
+        const spotStatusData = {
+            labels: ['Available', 'Occupied', 'Maintenance'],
+            datasets: [{
+                data: [
+                    {{ spot_status.available }},
+                    {{ spot_status.occupied }},
+                    {{ spot_status.maintenance }}
+                ],
+                backgroundColor: [
+                    'rgba(76, 175, 80, 0.8)',
+                    'rgba(239, 83, 80, 0.8)',
+                    'rgba(255, 152, 0, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(76, 175, 80, 1)',
+                    'rgba(239, 83, 80, 1)',
+                    'rgba(255, 152, 0, 1)'
+                ],
+                borderWidth: 2
+            }]
+        };
+
+        const revenueData = {
+            labels: {{ revenue_labels | tojson | safe }},
+            datasets: [{
+                label: 'Revenue ($)',
+                data: {{ revenue_data | tojson | safe }},
+                borderColor: 'rgba(63, 81, 181, 1)',
+                backgroundColor: 'rgba(63, 81, 181, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        };
+
+        // Initialize Charts
+        const lotBookingsCtx = document.getElementById('lotBookingsChart').getContext('2d');
+        new Chart(lotBookingsCtx, {
+            type: 'bar',
+            data: lotBookingsData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } },
+                    x: { grid: { color: 'rgba(255,255,255,0.1)' } }
+                }
+            }
+        });
+
+        const spotStatusCtx = document.getElementById('spotStatusChart').getContext('2d');
+        new Chart(spotStatusCtx, {
+            type: 'doughnut',
+            data: spotStatusData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 20, font: { size: 12 } }
+                    }
+                }
+            }
+        });
+
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(revenueCtx, {
+            type: 'line',
+            data: revenueData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } },
+                    x: { grid: { color: 'rgba(255,255,255,0.1)' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

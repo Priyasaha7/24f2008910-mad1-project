@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container lots-container">
+    <div class="dashboard-header mb-4">
+        <h2 class="page-title"><i class="fas fa-info-circle me-2"></i>Parking Spot Details</h2>
+        <p class="page-subtitle">View detailed information about this parking spot</p>
+    </div>
+    <div class="card table-card animate-fadein p-4">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="text-info mb-3">Spot Information</h5>
+                <p><strong>Spot ID:</strong> <span class="badge bg-info">{{ spot.id }}</span></p>
+                <p><strong>Spot Number:</strong> {{ spot.spot_number }}</p>
+                <p><strong>Status:</strong> 
+                    {% if spot.status == 'O' %}
+                        <span class="badge bg-danger">Occupied</span>
+                    {% elif spot.status == 'A' %}
+                        <span class="badge bg-success">Available</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">Maintenance</span>
+                    {% endif %}
+                </p>
+                <p><strong>Parking Lot:</strong> {{ spot.lot.name }}</p>
+                <p><strong>Location:</strong> {{ spot.lot.address.city }}, {{ spot.lot.address.pincode }}</p>
+                <p><strong>Price per Hour:</strong> <span class="price-badge">${{ spot.lot.price_per_hour }}</span></p>
+            </div>
+            
+            {% if reservation %}
+            <div class="col-md-6">
+                <h5 class="text-warning mb-3">Current Reservation</h5>
+                <p><strong>Customer ID:</strong> {{ reservation.user_id }}</p>
+                <p><strong>Customer Name:</strong> {{ reservation.user.name }}</p>
+                <p><strong>Email:</strong> {{ reservation.user.email }}</p>
+                <p><strong>Vehicle Number:</strong> {{ reservation.vehicle.license_plate }}</p>
+                <p><strong>Start Time:</strong> {{ reservation.start_time.strftime('%Y-%m-%d %H:%M') }}</p>
+                <p><strong>Est. End Time:</strong> {{ reservation.end_time.strftime('%Y-%m-%d %H:%M') }}</p>
+                <p><strong>Est. Cost:</strong> <span class="price-badge">${{ reservation.final_cost }}</span></p>
+                <p><strong>Status:</strong> <span class="badge bg-success">{{ reservation.status }}</span></p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <a href="{{ url_for('admin.edit_spot', lot_id=spot.lot_id, spot_id=spot.id) }}" class="btn btn-warning">
+                <i class="fas fa-edit me-2"></i>Edit Spot
+            </a>
+            {% if spot.status == 'O' %}
+                <form action="{{ url_for('admin.release_spot', spot_id=spot.id) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Release this spot?')">
+                        <i class="fas fa-unlock me-2"></i>Release Spot
+                    </button>
+                </form>
+            {% endif %}
+            <a href="{{ url_for('admin.view_spots') }}" class="btn btn-secondary">Back to Spots</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

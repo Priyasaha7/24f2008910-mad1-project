@@ -1,0 +1,177 @@
+{% extends 'layout.html' %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+
+<style>
+
+</style>
+{% endblock %}
+
+{% block title %}
+<title>Manage Users - Admin</title>
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid lots-container">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="page-title">
+                    <i class="fas fa-users me-3"></i>User Management
+                </h2>
+                <p class="page-subtitle">Administer all registered users and their activities.</p>
+            </div>
+        </div>
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="stat-card animate-fadein" style="animation-delay: 0.1s;">
+                    <div class="stat-icon users"><i class="fas fa-users"></i></div>
+                    <div class="stat-value">{{ stats.total_users }}</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="stat-card animate-fadein" style="animation-delay: 0.2s;">
+                    <div class="stat-icon users"><i class="fas fa-user-plus"></i></div>
+                    <div class="stat-value">{{ stats.new_users_week }}</div>
+                    <div class="stat-label">New This Week</div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="stat-card animate-fadein" style="animation-delay: 0.3s;">
+                    <div class="stat-icon users"><i class="fas fa-user-plus"></i></div>
+                    <div class="stat-value">{{ stats.new_users_month }}</div>
+                    <div class="stat-label">New This Month</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration Graph -->
+    <div class="mb-4">
+        <canvas id="userRegChart" height="60"></canvas>
+    </div>
+
+    <!-- Search & Role Filter -->
+    <form class="form-inline mb-3" method="get" action="{{ url_for('admin.manage_users') }}">
+        <input class="form-control mr-2" type="search" name="q" style="min-width: 280px;" placeholder="Search name, email, phone" value="{{ request.args.q or '' }}">
+        <select class="form-control mr-2" name="role">
+            <option value="">All Roles</option>
+            <option value="admin" {% if request.args.role == 'admin' %}selected{% endif %}>Admin</option>
+            <option value="user" {% if request.args.role == 'user' %}selected{% endif %}>User</option>
+        </select>
+        <button class="btn btn-primary" type="submit"><i class="fas fa-filter"></i> Filter</button>
+    </form>
+
+    <!-- Users Table -->
+    <div class="card shadow-sm table-card animate-fadein">
+        <div class="card-header bg-gradient-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i>All Users</h5>
+        </div>
+        <div class="card-body p-0">
+            {% if users %}
+            <div class="table-responsive">
+                <table class="table table-dark table-hover lots-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th>Registered</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td><span class="badge bg-info">{{ user.id }}</span></td>
+                            <td class="fw-bold text-warning">{{ user.full_name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.phone or '-' }}</td>
+                            <td>
+                                {% if user.is_admin %}
+                                    <span class="badge bg-success">Admin</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">User</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.registered_on.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ url_for('admin.user_profile', user_id=user.id) }}" class="btn btn-info btn-sm btn-edit" title="Profile">
+                                        <i class="fas fa-user-circle"></i>
+                                    </a>
+                                    <a href="{{ url_for('admin.edit_user', user_id=user.id) }}" class="btn btn-warning btn-sm btn-edit" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="post" action="{{ url_for('admin.manage_users') }}" style="display:inline;">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="hidden" name="action" value="toggle_role">
+                                    </form>
+                                    {% if not user.is_admin %}
+                                    <form method="post" action="{{ url_for('admin.manage_users') }}" style="display:inline;">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <input type="hidden" name="action" value="delete">
+                                        <button type="submit" class="btn btn-danger btn-sm btn-delete" 
+                                                onclick="return confirm('Delete this user?');">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-users fa-3x mb-3"></i>
+                <h4>No Users Found</h4>
+                <p>No registered users yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctx = document.getElementById('userRegChart').getContext('2d');
+    var labels = {{ reg_graph.labels|tojson|default([]) }};
+    var data = {{ reg_graph.data|tojson|default([]) }};
+    if (labels.length > 0 && data.length > 0) {
+        var userRegChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Registrations',
+                    data: data,
+                    borderColor: '#00e5ff',
+                    backgroundColor: 'rgba(0,229,255,0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    } else {
+        ctx.fillStyle = '#9fa2b1';
+        ctx.textAlign = 'center';
+        ctx.fillText('No registration data available', ctx.canvas.width/2, ctx.canvas.height/2);
+    }
+</script>
+{% endblock %}

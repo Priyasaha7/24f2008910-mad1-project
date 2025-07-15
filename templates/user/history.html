@@ -1,0 +1,181 @@
+{% extends "layout.html" %}
+
+{% block style %}
+<style>
+    body {
+        background-color: #070f28;
+    }
+    .history-container {
+        background: #1c2236;
+        border-radius: 18px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        margin-top: 2rem;
+        animation: fadeIn 0.8s;
+    }
+    .history-table {
+        background: #1e2230;
+        color: #e0e6f3;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .history-table th {
+        background: #051a2e;
+        color: #dcdee0;
+        font-weight: 600;
+        padding: 1.2rem 1.5rem;
+        border-bottom: 2px solid #3d4758;
+    }
+    .history-table tbody tr {
+        background-color: rgb(33, 33, 33) !important;
+        color: #e0e6f3 !important;
+    }
+    .history-table td {
+        background-color: rgb(33, 33, 33) !important;
+        color: #e0e6f3 !important;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #2a3142;
+        vertical-align: middle;
+    }
+    .history-table tr:last-child td {
+        border-bottom: none;
+    }
+    .history-table tr:hover {
+        background: #2a3142;
+        transition: background 0.3s;
+    }
+    .status-badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    .status-active {
+        background: rgba(76, 175, 80, 0.2);
+        color: #4caf50;
+    }
+    .status-completed {
+        background: rgba(33, 150, 243, 0.2);
+        color: #2196f3;
+    }
+    .status-released {
+        background: rgba(244, 67, 54, 0.2);
+        color: #f44336;
+    }
+    .price-cell {
+        font-weight: 600;
+        color: #ffd93d;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: none; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container history-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-light">
+            <i class="fas fa-history me-2 text-info"></i>Your Booking History
+        </h2>
+        <a href="{{ url_for('user.new_booking') }}" class="btn btn-outline-light">
+            <i class="fas fa-plus me-2"></i>New Booking
+        </a>
+    </div>
+    
+    {% if history %}
+    <div class="table-responsive">
+        <table class="table history-table">
+            <thead>
+                <tr>
+                    <th>Reservation ID</th>
+                    <th>Spot</th>
+                    <th>Status</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Duration</th>
+                    <th>Amount</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for res in history %}
+                <tr>
+                    <td class="fw-bold">{{ res.id }}</td>
+                    <td>
+                        <span class="badge bg-info">{{ res.spot.spot_number }}</span>
+                        <small class=" ms-2">{{ res.spot.lot.name }}</small>
+                    </td>
+                    <td>
+                        <span class="status-badge 
+                            {% if res.status == 'Active' %}status-active
+                            {% elif res.status == 'Completed' %}status-completed
+                            {% else %}status-released{% endif %}">
+                            {{ res.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <span>{{ res.start_time.strftime('%H:%M') }}</span><br>
+                        <span style="color: #b0b6c6; font-size: 0.95em;">{{ res.start_time.strftime('%d-%m-%y') }}</span>
+                    </td>
+                    <td>
+                        {% if res.end_time %}
+                            <span>{{ res.end_time.strftime('%H:%M') }}</span><br>
+                            <span style="color: #b0b6c6; font-size: 0.95em;">{{ res.end_time.strftime('%d-%m-%y') }}</span>
+                        {% else %}
+                            <span class="text-light">-</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if res.end_time %}
+                            {% set duration = res.end_time - res.start_time %}
+                            {% set hours = duration.total_seconds() // 3600 %}
+                            {% set minutes = (duration.total_seconds() // 60) % 60 %}
+                            {{ hours|int }}h {{ minutes|int }}m
+                        {% elif res.status == 'Active' %}
+                            {% set duration = (current_date - res.start_time) %}
+                            {% set hours = duration.total_seconds() // 3600 %}
+                            {% set minutes = (duration.total_seconds() // 60) % 60 %}
+                            {{ hours|int }}h {{ minutes|int }}m
+                        {% else %}
+                            <span class="text-light">-</span>
+                        {% endif %}
+                    </td>
+                    <td class="price-cell">
+                        {% if res.final_cost %}
+                            ₹{{ "%.2f"|format(res.final_cost) }}
+                        {% else %}
+                            <span class="text-light">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if res.status == 'Active' %}
+                            <a href="{{ url_for('user.release_reservation', res_id=res.id) }}" 
+                               class="btn btn-danger btn-sm">
+                                <i class="fas fa-sign-out-alt me-1"></i> Release
+                            </a>
+                        {% elif res.status == 'Released' %}
+                            <span class="badge bg-secondary">Parked Out</span>
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-history fa-3x text-muted mb-3"></i>
+        <h4 class="text-light">No Booking History</h4>
+        <p class="text-muted">You haven't made any reservations yet</p>
+        <a href="{{ url_for('user.new_booking') }}" class="btn btn-primary mt-2">
+            <i class="fas fa-parking me-2"></i>Book a Spot
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

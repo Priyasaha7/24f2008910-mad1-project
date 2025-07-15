@@ -1,0 +1,183 @@
+{% extends 'layout.html' %}
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <style>
+        .card{
+            background-color: rgb(4, 15, 37);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f10c0c, #fc7070);
+            border: none;
+            border-radius: 15px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-danger:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Ensure no horizontal scrolling */
+        html, body {
+            overflow-x: hidden;
+        }
+        .container-fluid, .lots-container {
+            max-width: 100vw;
+            overflow-x: hidden;
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+        .row {
+            flex-wrap: wrap !important;
+            margin-left: -12px;
+            margin-right: -12px;
+        }
+        .col-lg-4, .col-md-6, .mb-4 {
+            /* No change in width or gap */
+            box-sizing: border-box;
+        }
+        /* If you use custom card classes, make sure their width is not >100% */
+        .lot-card {
+            width: 100%;
+            min-width: 0;
+        }
+    </style>
+{% endblock %}
+
+
+
+
+{% block content %}
+<div class="container-fluid lots-container">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="page-title">
+                    <i class="fas fa-parking me-3"></i>Parking Spots Overview
+                </h2>
+                <p class="page-subtitle">Manage parking lots and their occupancy</p>
+            </div>
+            <a href="{{ url_for('admin.add_spot', lot_id=1) }}" class="btn btn-primary btn-add-lot">
+                <i class="fas fa-plus me-2"></i>Add New Spot
+            </a>
+        </div>
+        
+        <!-- Overall Stats Cards -->
+        {% set total_spots = lots_stats|sum(attribute='total') %}
+        {% set total_available = lots_stats|sum(attribute='available') %}
+        {% set total_occupied = lots_stats|sum(attribute='occupied') %}
+        {% set total_maintenance = lots_stats|sum(attribute='maintenance') %}
+        
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card animate-fadein">
+                    <div class="stat-icon spots"><i class="fas fa-parking"></i></div>
+                    <div class="stat-value">{{ total_spots }}</div>
+                    <div class="stat-label">Total Spots</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card animate-fadein">
+                    <div class="stat-icon lots"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-value">{{ total_available }}</div>
+                    <div class="stat-label">Available</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card animate-fadein">
+                    <div class="stat-icon active"><i class="fas fa-car"></i></div>
+                    <div class="stat-value">{{ total_occupied }}</div>
+                    <div class="stat-label">Occupied</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card animate-fadein">
+                    <div class="stat-icon users"><i class="fas fa-tools"></i></div>
+                    <div class="stat-value">{{ total_maintenance }}</div>
+                    <div class="stat-label">Maintenance</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parking Lots Cards -->
+    <div class="row">
+        {% for lot_stat in lots_stats %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card shadow-sm lot-card animate-fadein">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-building me-2"></i>{{ lot_stat.lot.name }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="lot-info mb-3">
+                        <p class="text-light mb-1">
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            {{ lot_stat.lot.address.city }}, {{ lot_stat.lot.address.pincode }}
+                        </p>
+                        <p class="text-light mb-0">
+                            <strong>Total Spots:</strong> {{ lot_stat.total }}
+                        </p>
+                    </div>
+                    
+                    <!-- Occupancy Stats -->
+                    <div class="occupancy-stats">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="badge bg-success">
+                                Available: {{ lot_stat.available }}
+                            </span>
+                            <span class="badge bg-danger">
+                                Occupied: {{ lot_stat.occupied }}
+                            </span>
+                            {% if lot_stat.maintenance > 0 %}
+                            <span class="badge bg-warning text-dark">
+                                Maintenance: {{ lot_stat.maintenance }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Occupancy Progress Bar -->
+                        {% set occupancy_percent = (lot_stat.occupied / lot_stat.total * 100) if lot_stat.total > 0 else 0 %}
+                        <div class="progress mb-3" style="height: 10px;">
+                            <div class="progress-bar bg-danger" role="progressbar" 
+                                 style="width: {{ occupancy_percent }}%" 
+                                 aria-valuenow="{{ occupancy_percent }}" 
+                                 aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        <small class="text-light">{{ "%.1f"|format(occupancy_percent) }}% Occupied</small>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="mt-3">
+                        <a href="{{ url_for('admin.view_lot_spots', lot_id=lot_stat.lot.id) }}" 
+                           class="btn btn-primary btn-add-lot ">
+                            <i class="fas fa-list me-1"></i>View Spots
+                        </a>
+                        {% if lot_stat.occupied > 0 %}
+                        <a href="{{ url_for('admin.view_lot_spots', lot_id=lot_stat.lot.id) }}?filter=occupied" 
+                           class="btn btn-danger btn-sm btn-danger">
+                            <i class="fas fa-car me-1"></i>Occupied ({{ lot_stat.occupied }})
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% if not lots_stats %}
+    <div class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-parking fa-3x mb-3 text-muted"></i>
+            <h4>No Parking Lots Found</h4>
+            <p>Create your first parking lot to get started.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

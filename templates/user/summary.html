@@ -1,0 +1,251 @@
+{% extends 'layout.html' %}
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <style>
+        .dashboard-card {
+            background: linear-gradient(135deg, #01151b, #173d5e);
+            border-radius: 18px;
+            border: 1px solid #2a3a6a;
+            box-shadow: 0 6px 24px 0 rgba(0,0,0,0.12);
+        }
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        .box {
+            background-color: #01051b;
+            border-radius: 24px;
+        }
+        .quick-actions {
+            margin-bottom: 2.5rem;
+            gap: 1.2rem;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .quick-actions .btn {
+            min-width: 170px;
+            font-size: 1.08rem;
+            font-weight: 600;
+            padding: 0.9rem 1.5rem;
+            border-radius: 22px;
+            box-shadow: 0 2px 8px rgba(25, 118, 165, 0.10);
+            margin-bottom: 0.5rem;
+        }
+        .dashboard-header {
+            margin-bottom: 2.5rem;
+        }
+        @media (max-width: 991px) {
+            .chart-container { height: 220px; }
+            .quick-actions { flex-direction: column; gap: 0.7rem; }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <a href="{{ url_for('user.new_booking') }}" class="btn btn-outline-primary">
+            <i class="fas fa-plus me-2"></i>Book New Spot
+        </a>
+        <a href="{{ url_for('user.profile') }}" class="btn btn-outline-info">
+            <i class="fas fa-user-cog me-2"></i>Go to Profile
+        </a>
+        <a href="{{ url_for('user.history') }}" class="btn btn-outline-warning">
+            <i class="fas fa-history me-2"></i>Booking History
+        </a>
+    </div>
+
+    <!-- User Summary Header -->
+    <div class="dashboard-card shadow-lg mb-4 p-4 animate-fadein dashboard-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2 class="text-light mb-0">User Summary: {{ user.full_name }}</h2>
+                <p class="text-light mb-0">{{ user.email }} | {{ user.phone }}</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <span class="badge bg-primary p-2">
+                    Member since: {{ user.registered_on.strftime('%d %b %Y') }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="dashboard-card text-center p-4 h-100">
+                <div class="stat-icon text-primary">
+                    <i class="fas fa-car"></i>
+                </div>
+                <h3 class="text-light">{{ user.vehicles|length }}</h3>
+                <p class="text-light mb-0">Registered Vehicles</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="dashboard-card text-center p-4 h-100">
+                <div class="stat-icon text-success">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3 class="text-light">{{ total_bookings }}</h3>
+                <p class="text-light mb-0">Total Bookings</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="dashboard-card text-center p-4 h-100">
+                <div class="stat-icon text-warning">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <h3 class="text-light">₹{{ total_spent }}</h3>
+                <p class="text-light mb-0">Total Spent</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Two Modern Diagrams -->
+    <div class="row mb-4">
+        <!-- Line Chart: Monthly Cost Trend -->
+        <div class="col-md-6 mb-4">
+            <div class="dashboard-card p-4 h-100">
+                <h4 class="text-light mb-3"><i class="fas fa-chart-line me-2"></i>Monthly Cost Trend</h4>
+                <div class="chart-container">
+                    <canvas id="costTrendChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- Doughnut Chart: Monthly Bookings -->
+        <div class="col-md-6 mb-4">
+            <div class="dashboard-card p-4 h-100">
+                <h4 class="text-light mb-3"><i class="fas fa-chart-pie me-2"></i>Monthly Bookings</h4>
+                <div class="chart-container">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <div class="row mb-4 g-4">
+    <!-- Registered Vehicles -->
+    <div class="col-lg-6">
+        <div class="dashboard-card p-4 h-100">
+            <h4 class="text-light mb-4">
+                <i class="fas fa-car me-2"></i>Your Vehicles
+            </h4>
+            <div class="row g-3">
+                {% for vehicle in user.vehicles %}
+                <div class="col-md-12">
+                    <div class="box p-3 d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-2">
+                        <div>
+                            <h5 class="text-light mb-1">{{ vehicle.plate_number }}</h5>
+                            <span class="badge bg-secondary me-2">{{ vehicle.vehicle_type }}</span>
+                            <span class="text-light ms-2">{{ vehicle.color }}</span>
+                        </div>
+                        <small class="text-light mt-2 mt-md-0">
+                            Registered: {{ vehicle.registered_on.strftime('%d %b %Y') }}
+                        </small>
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-12 text-center py-4">
+                    <i class="fas fa-car fa-3x text-muted mb-3"></i>
+                    <p class="text-light">No vehicles registered</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <!-- Address Information -->
+    <div class="col-lg-6">
+        <div class="dashboard-card p-4 h-100">
+            <h4 class="text-light mb-4">
+                <i class="fas fa-map-marker-alt me-2"></i>Your Address
+            </h4>
+            {% if user.address %}
+            <div class="box p-3">
+                <p class="text-light mb-1">{{ user.address.address }}</p>
+                <p class="text-light mb-1">
+                    {{ user.address.city }}, {{ user.address.state }} - {{ user.address.pincode }}
+                </p>
+                {% if user.address.landmark %}
+                <p class="text-light mb-0">Landmark: {{ user.address.landmark }}</p>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-map-marker-alt fa-3x text-muted mb-3"></i>
+                <p class="text-light">No address registered</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Monthly Cost Trend Line Chart
+const ctc = document.getElementById('costTrendChart').getContext('2d');
+const months = {{ monthly_costs.keys()|list|tojson }};
+const costs = {{ monthly_costs.values()|list|tojson }};
+const costTrendChart = new Chart(ctc, {
+    type: 'line',
+    data: {
+        labels: months,
+        datasets: [{
+            label: 'Total Cost (₹)',
+            data: costs,
+            borderColor: '#003153',
+            backgroundColor: 'rgba(25, 118, 165, 0.2)',
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { ticks: { color: '#e0e6f3' } },
+            y: { ticks: { color: '#e0e6f3' }, beginAtZero: true }
+        }
+    }
+});
+
+// Monthly Bookings Doughnut Chart
+const ctx2 = document.getElementById('monthlyChart').getContext('2d');
+const monthlyChart = new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+        labels: ['This Month', 'Last Month', 'Previous'],
+        datasets: [{
+            data: [{{ current_month_bookings }}, {{ last_month_bookings }}, {{ previous_bookings }}],
+            backgroundColor: [
+                '#003153',  // Deep blue
+                '#1976A5',  // Teal blue
+                '#FFC300'   // Amber gold
+            ],
+            borderColor: '#0b1327',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    color: '#e0e6f3',
+                    padding: 20
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
