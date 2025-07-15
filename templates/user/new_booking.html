@@ -1,0 +1,257 @@
+{% extends 'layout.html' %}
+
+{% block style %}
+    <style>  
+/* Dark Theme Variables */
+
+body {
+  background-color: #181c24;
+    font-family: 'Inter', sans-serif;
+    color: #e8eaf6;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+:root {
+  --bg-main: #181c24;
+  --bg-card: #23283a;
+  --bg-gradient-primary: linear-gradient(90deg, #283e51 0%, #485563 100%);
+  --text-main: #fdfdfd;
+  --text-secondary: #8fa6c9;
+  --accent: #d1dade;
+  --accent-2: #00e5ff;
+  --table-header: #202940;
+  --modal-bg: #23283a;
+  --modal-header: #29b6f6;
+  --border-radius: 18px;
+  --shadow: 0 4px 24px rgba(41,182,246,0.07);
+}
+
+/* Container and Card */
+.booking-container {
+  background: var(--bg-main);
+  border-radius: var(--border-radius);
+  padding: 2.5rem 2rem;
+  box-shadow: var(--shadow);
+  animation: fadeIn 1s;
+}
+
+.card{
+  background-color: #181c24;
+}
+/* Card Header */
+.card-header.bg-gradient-primary {
+  background: var(--bg-gradient-primary) !important;
+  color: var(--text-main) !important;
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+}
+
+/* Table */
+.booking-table {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+.booking-table th {
+  background: var(--table-header) !important;
+  color: var(--accent);
+  border: none;
+}
+.booking-table td {
+  border-top: 1px solid #222a3a;
+  vertical-align: middle;
+}
+.table-hover tbody tr:hover {
+  background: #263040;
+  transition: background 0.3s;
+}
+
+/* Search Input */
+.search-input {
+  background: #1e2336;
+  border-radius: 12px;
+  transition: border 0.3s;
+}
+.search-input::placeholder {
+  color: #888888 !important;
+  opacity: 1;
+}
+
+.search-input:focus {
+  background: #263040;
+  color: #fff;
+  outline: none;
+}
+
+/* Buttons */
+.btn-primary, .btn-success, .btn-secondary {
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(41,182,246,0.09);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-primary:hover, .btn-success:hover, .btn-secondary:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 16px rgba(41,182,246,0.15);
+}
+
+/* Modal */
+.modal-dark-bg {
+  background: var(--modal-bg);
+  color: var(--text-main);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  animation: modalPop 0.5s;
+}
+.modal-header.bg-info {
+  background: var(--modal-header) !important;
+  color: #fff !important;
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+}
+.btn-close-white {
+  filter: invert(1);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px);}
+  to   { opacity: 1; transform: none;}
+}
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.85);}
+  to   { opacity: 1; transform: scale(1);}
+}
+.animate-fadein { animation: fadeIn 1s; }
+.animate-pop { animation: modalPop 0.5s; }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 booking-container">
+    <h2 class="mb-4 text-grey fw-bold animate-fadein">Search parking <span class="text-secondary">@location/pin code</span>:</h2>
+    <form method="get" action="{{ url_for('user.new_booking') }}" class="mb-4 d-flex animate-fadein">
+        <input type="text" name="q" class="form-control me-2 search-input" placeholder="e.g. Dadar Road or 400014" value="{{ search_query or '' }}">
+        <button type="submit" class="btn btn-primary shadow-sm">Search</button>
+    </form>
+
+    {% if lots %}
+    <div class="card shadow-sm animate-fadein">
+        <div class="card-header bg-gradient-primary text-white fw-bold">
+            Parking Lots{% if search_query %} @ {{ search_query }}{% endif %}
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-dark table-hover mb-0 booking-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Address</th>
+            <th>Availability</th>
+            <th>Price</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for lot in lots %}
+        <tr>
+            <td>{{ lot.id }}</td>
+            <td>{{ lot.address.address }}, {{ lot.address.city }}, {{ lot.address.pincode }}</td>
+            <td>
+                {{ lot.spots | selectattr('status', 'equalto', 'A') | list | length }}
+            </td>
+            <td>
+                ₹{{ "%.2f"|format(lot.price_per_hour) }}/hr
+            </td>
+            <td>
+                {% if lot.spots | selectattr('status', 'equalto', 'A') | list | length > 0 %}
+                    <a href="{{ url_for('user.book_spot', lot_id=lot.id) }}" class="btn btn-success btn-sm">Book</a>
+                {% else %}
+                    <span class="text-danger">Full</span>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+        </div>
+    </div>
+    {% else %}
+        <div class="alert alert-warning mt-3 animate-fadein">No parking lots found for this location.</div>
+    {% endif %}
+</div>
+
+<!-- Booking Modal -->
+<div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="post" action="" id="bookingForm">
+      <div class="modal-content modal-dark-bg animate-modal">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title fw-bold" id="bookModalLabel">Book the parking spot</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-3">
+                <label class="form-label">Spot ID</label>
+                <select class="form-select" name="spot_id" id="modalSpotId" required>
+                    <!-- Dynamically filled -->
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Lot ID</label>
+                <input type="text" class="form-control" name="lot_id" id="modalLotId" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">User ID</label>
+                <input type="text" class="form-control" name="user_id" id="modalUserId" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Vehicle Number</label>
+                <input type="text" class="form-control" name="vehicle_plate" required>
+            </div>
+            <!-- Add more fields as needed -->
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Reserve</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+    
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var bookModal = document.getElementById('bookModal');
+    bookModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var lotId = button.getAttribute('data-lot-id');
+        var userId = button.getAttribute('data-user-id');
+        document.getElementById('modalLotId').value = lotId;
+        document.getElementById('modalUserId').value = userId;
+
+        // Fetch available spots for this lot via AJAX
+        fetch(`/user/lots/${lotId}/spots`)
+            .then(response => response.json())
+            .then(data => {
+                var spotSelect = document.getElementById('modalSpotId');
+                spotSelect.innerHTML = '';
+                data.spots.forEach(function(spot) {
+                    var option = document.createElement('option');
+                    option.value = spot.id;
+                    option.text = spot.spot_number + ' (ID: ' + spot.id + ')';
+                    spotSelect.appendChild(option);
+                });
+            });
+
+        // Set form action (you may want to update this if you use a different endpoint)
+        document.getElementById('bookingForm').action = '/user/reserve/';
+    });
+});
+</script>
+{% endblock %}

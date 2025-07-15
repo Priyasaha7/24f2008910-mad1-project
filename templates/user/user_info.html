@@ -1,0 +1,435 @@
+{% extends 'layout.html' %}
+
+{% block style %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        background: #0a1c2d;
+        font-family: 'Inter', sans-serif;
+        color: #e8eaf6;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+    /* Header Animation */
+    .dashboard-header {
+        background: linear-gradient(135deg, #010f1d 0%, rgba(31, 36, 80, 0.9) 100%);
+        backdrop-filter: blur(20px);
+        border-radius: 25px;
+        margin: 2rem auto;
+        max-width: 1200px;
+        padding: 2rem;
+        animation: slideInFromTop 0.8s ease-out;
+    }
+    @keyframes slideInFromTop {
+        0% { transform: translateY(-50px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 1; }
+    }
+    /* User Profile Section */
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .profile-avatar {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #3f51b5, #2196f3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 2px rgba(1, 1, 17, 0.5);
+        animation: avatarPulse 3s ease-in-out infinite;
+        overflow: hidden;
+    }
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .profile-avatar i {
+        font-size: 2.5rem;
+        color: white;
+    }
+    .user-info h2 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #c5cae9;
+    }
+    .user-info p {
+        color: #9fa8da;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    /* Parking Cards */
+    .parking-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    .parking-card {
+        background: rgba(9, 12, 21, 0.7);
+        backdrop-filter: blur(15px);
+        border-radius: 20px;
+        padding: 1.5rem;
+        border: 1px solid rgba(255,255,255,0.1);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.6s ease-out;
+        box-shadow: 0 10px 10px rgba(0,0,0,0.2);
+    }
+    .parking-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 10px rgba(65, 72, 113, 0.4);
+    }
+    @keyframes fadeInUp {
+        0% { transform: translateY(30px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 1; }
+    }
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .card-header i {
+        font-size: 1.8rem;
+        color: #7986cb;
+        background: rgba(121,134,203,0.1);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: iconFloat 3s ease-in-out infinite;
+    }
+    @keyframes iconFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+    }
+    .card-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #e8eaf6;
+    }
+    .card-details {
+        margin-top: 1rem;
+    }
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.7rem 0;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .detail-item:last-child {
+        border-bottom: none;
+    }
+    .detail-label {
+        color: #9fa8da;
+    }
+    .detail-value {
+        font-weight: 500;
+        color: #c5cae9;
+    }
+    /* Action Buttons */
+    .action-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    .action-btn {
+        background: linear-gradient(45deg, #222c64, #0d3251);
+        border: none;
+        border-radius: 15px;
+        color: white;
+        padding: 3rem 2rem;
+        font-weight: 600;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 2px rgba(63,81,181,0.3);
+        animation: fadeInUp 0.6s ease-out;
+    }
+    .action-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 10px rgba(55, 65, 119, 0.4);
+
+    }
+    .action-btn i {
+        font-size: 2.5rem;
+        color: white;
+    }
+    /* Stats Section */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    .stat-card {
+        background: rgba(1, 3, 30, 0.6);
+        backdrop-filter: blur(15px);
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,0.1);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.6s ease-out;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 10px rgba(158, 158, 160, 0.3);
+    }
+    .stat-icon {
+        font-size: 2.5rem;
+        color: #eff0f4;
+        margin-bottom: 1rem;
+        animation: iconFloat 3s ease-in-out infinite;
+    }
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #e8eaf6;
+        margin: 0.5rem 0;
+    }
+    .stat-label {
+        color: #9fa8da;
+        font-size: 1rem;
+    }
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .dashboard-header {
+            margin: 1rem;
+            padding: 1.5rem;
+        }
+        .user-profile {
+            flex-direction: column;
+            text-align: center;
+        }
+        .parking-cards, .action-buttons, .stats-container {
+            grid-template-columns: 1fr;
+        }
+    }
+    /* Badge Styles */
+    .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    .bg-success {
+        background: linear-gradient(45deg, #28a745, #20c997) !important;
+    }
+    .bg-secondary {
+        background: linear-gradient(45deg, #6c757d, #5a6268) !important;
+    }
+    /* Release Button Styles */
+    .btn-danger {
+        transition: all 0.3s ease;
+    }
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 1px 2px rgba(145, 145, 145, 0.4);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <!-- Dashboard Header (profile + stats only) -->
+    <div class="dashboard-header">
+        <div class="user-profile">
+            <div class="profile-avatar">
+                <img src="{{ url_for('static', filename='images/user.png') }}" alt="User Profile">
+            </div>
+            <div class="user-info">
+                <h2>Welcome Back, {{ user.full_name or 'User' }}!</h2>
+                <p>
+                    <i class="fas fa-calendar-alt"></i>
+                    Today is {{ current_date.strftime('%A, %B %d, %Y') }}
+                </p>
+            </div>
+        </div>
+        <!-- Stats Container -->
+        <div class="stats-container">
+            <div class="stat-card" style="animation-delay: 0.1s;">
+                <div class="stat-icon"><i class="fas fa-car"></i></div>
+                <div class="stat-value">{{ stats.total_bookings }}</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+            <div class="stat-card" style="animation-delay: 0.2s;">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-value">{{ stats.completed }}</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card" style="animation-delay: 0.3s;">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-value">{{ stats.active_now }}</div>
+                <div class="stat-label">Active Now</div>
+            </div>
+            <div class="stat-card" style="animation-delay: 0.4s;">
+                <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+                <div class="stat-value">{{ stats.total_hours }}</div>
+                <div class="stat-label">Total Hours Parked</div>
+            </div>
+        </div>
+    </div>
+    <!-- Main Content Container -->
+    <div class="container" style="max-width: 1200px;">
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="{{ url_for('user.new_booking') }}" class="action-btn" style="animation-delay: 0.1s; text-decoration: none;">
+                <i class="fas fa-plus-circle"></i>
+                New Booking
+            </a>
+            <a href="{{ url_for('user.summary') }}" class="action-btn" style="animation-delay: 0.2s; text-decoration: none;">
+                <i class="fas fa-chart-pie"></i>
+                View Summary
+            </a>
+            <a href="{{ url_for('user.history') }}" class="action-btn" style="animation-delay: 0.3s; text-decoration: none;">
+                <i class="fas fa-history"></i>
+                Booking History
+            </a>
+            <a href="{{ url_for('user.profile') }}" class="action-btn" style="animation-delay: 0.4s; text-decoration: none;">
+                <i class="fas fa-user-cog"></i>
+                Edit Profile
+            </a>
+        </div>
+        <!-- Active Parking Sessions -->
+        <h2 class="mb-4" style="color: #c5cae9; font-weight: 600;">
+            <i class="fas fa-car me-2"></i>
+            Active Parking Sessions
+        </h2>
+        <div class="parking-cards">
+            {% for res in active_sessions %}
+            <div class="parking-card" style="animation-delay: {{ loop.index * 0.1 }}s;">
+                <div class="card-header">
+                    <i class="fas fa-warehouse"></i>
+                    <div>
+                        <h3 class="card-title">{{ res.spot.lot.name }}</h3>
+                        <p>ID: PARK-{{ res.id }}</p>
+                    </div>
+                    <div class="ms-auto">
+                        <span class="badge bg-success">Active</span>
+                    </div>
+                </div>
+                <div class="card-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Entry Time:</span>
+                        <span class="detail-value">{{ res.start_time.strftime('%d/%m/%Y %H:%M') }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Spot:</span>
+                        <span class="detail-value">{{ res.spot.spot_number }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Vehicle:</span>
+                        <span class="detail-value">{{ res.vehicle_plate }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Duration:</span>
+                        <span class="detail-value">
+                            {% set duration = (current_date - res.start_time) %}
+                            {% set hours = duration.total_seconds() // 3600 %}
+                            {% set minutes = (duration.total_seconds() // 60) % 60 %}
+                            {{ hours|int }}h {{ minutes|int }}m
+                        </span>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="{{ url_for('user.release_reservation', res_id=res.id) }}" 
+                       class="btn btn-danger btn-sm w-100">
+                        <i class="fas fa-sign-out-alt me-2"></i>
+                        Release Parking Spot
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center" style="color: #9fa8da; padding: 2rem;">
+                <i class="fas fa-car fa-3x mb-3" style="opacity: 0.3;"></i>
+                <p>No active parking sessions</p>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- Recent Parking History Section -->
+        <h2 class="mb-4" style="color: #c5cae9; font-weight: 600; margin-top: 3rem;">
+            <i class="fas fa-history me-2"></i>
+            Recent Booking History
+        </h2>
+        <div class="parking-cards">
+            {% for history in recent_history %}
+            <div class="parking-card" style="animation-delay: {{ loop.index * 0.1 }}s;">
+                <div class="card-header">
+                    <i class="fas fa-parking"></i>
+                    <div>
+                        <h3 class="card-title">{{ history.spot.lot.name }}</h3>
+                        <p>ID: PARK-{{ history.id }}</p>
+                    </div>
+                    <div class="ms-auto">
+                        {% if history.status == 'Active' %}
+                            <span class="badge bg-success">Active</span>
+                        {% elif history.status == 'Released' %}
+                            <span class="badge bg-secondary">Released</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Vehicle:</span>
+                        <span class="detail-value">{{ history.vehicle_plate }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Parking Time:</span>
+                        <span class="detail-value">{{ history.start_time.strftime('%d/%m/%Y %H:%M') }}</span>
+                    </div>
+                    {% if history.status == 'Released' and history.end_time %}
+                        <div class="detail-item">
+                            <span class="detail-label">Releasing Time:</span>
+                            <span class="detail-value">{{ history.end_time.strftime('%d/%m/%Y %H:%M') }}</span>
+                        </div>
+                    {% endif %}
+                    <div class="detail-item">
+                        <span class="detail-label">Spot:</span>
+                        <span class="detail-value">{{ history.spot.spot_number }}</span>
+                    </div>
+                    {% if history.final_cost %}
+                    <div class="detail-item">
+                        <span class="detail-label">Total Cost:</span>
+                        <span class="detail-value">₹{{ "%.2f"|format(history.final_cost) }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% if history.status == 'Active' %}
+                <div class="mt-3">
+                    <a href="{{ url_for('user.release_reservation', res_id=history.id) }}" 
+                       class="btn btn-danger btn-sm w-100">
+                        <i class="fas fa-sign-out-alt me-2"></i>
+                        Release Parking Spot
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            {% if not recent_history %}
+            <div class="text-center" style="color: #9fa8da; padding: 2rem;">
+                <i class="fas fa-history" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                <p>No parking history found</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

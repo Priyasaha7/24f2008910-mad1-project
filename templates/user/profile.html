@@ -1,0 +1,499 @@
+
+    {% extends 'layout.html' %}
+    {% block style %}
+        
+        <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #011220 0%, #0e2235 50%, #0a1520 100%);
+            font-family: 'Inter', sans-serif;
+            color: #e8eaf6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+       
+
+        /* Header Animation */
+        .profile-header {
+            background-color: #03081e;
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            margin: 2rem auto;
+            max-width: 1000px;
+            padding: 2rem;
+            box-shadow: 0 0px 10px rgba(143, 143, 146, 0.3), 0 0 0 1px rgba(255,255,255,0.1);
+            animation: slideInFromTop 0.8s ease-out;
+        }
+        
+        @keyframes slideInFromTop {
+            0% { transform: translateY(-50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* Profile Avatar */
+        .profile-avatar {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 2rem;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #0e0e10, #164d79);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: avatarPulse 3s ease-in-out infinite;
+            overflow: hidden;
+        }
+        
+
+        
+        .profile-avatar i {
+            font-size: 4rem;
+            color: white;
+            animation: iconBounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes iconBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        /* Form Container */
+        .form-container {
+            background: rgba(2, 4, 21, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: slideInFromBottom 0.8s ease-out 0.3s both;
+        }
+        
+        @keyframes slideInFromBottom {
+            0% { transform: translateY(50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* Form Groups */
+        .form-group {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        
+        .form-label {
+            color: #c5cae9;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-label i {
+            color: #bfc7f3;
+            animation: iconGlow 2s ease-in-out infinite alternate;
+        }
+        
+
+        .form-control {
+            background: rgba(15, 20, 25, 0.8);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(63,81,181,0.3);
+            border-radius: 12px;
+            color: #e8eaf6;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .form-control:focus {
+            background: rgba(15,20,25,0.9);
+            border-color: #3f51b5;
+            box-shadow: 0 0 0 0.2rem rgba(63,81,181,0.25), inset 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+        
+        .form-control::placeholder {
+            color: rgba(200,200,200,0.6);
+        }
+        
+        /* Animated Buttons */
+        .btn-animated {
+            background: linear-gradient(45deg, #071116, #244968);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 5px rgba(11, 11, 15, 0.4);
+            cursor: pointer;
+        }
+        
+        .btn-animated::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-animated:hover::before {
+            left: 100%;
+        }
+        
+        .btn-animated:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 5px rgba(61, 61, 63, 0.4);
+        }
+        
+        .btn-secondary-animated {
+            background: linear-gradient(45deg, #202527, #032b3e);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: #000;
+        }
+        
+        .btn-secondary-animated:hover {
+            background: linear-gradient(45deg, #455a64, #607d8b);
+            border-color: rgba(255,255,255,0.3);
+        }
+        
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem auto;
+            max-width: 1000px;
+        }
+        
+        .stat-card {
+            background: rgba(2, 3, 17, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(63,81,181,0.3);
+        }
+        
+        @keyframes fadeInUp {
+            0% { transform: translateY(30px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+            color: #9fa2b1;
+            margin-bottom: 1rem;
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* Alert Animations */
+        .alert {
+            border-radius: 12px;
+            border: none;
+            animation: alertSlideIn 0.5s ease-out;
+        }
+        
+        @keyframes alertSlideIn {
+            0% { transform: translateX(-100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(63,81,181,0.3);
+            border-left: 4px solid #3f51b5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .profile-header, .form-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            
+            .profile-avatar {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .profile-avatar i {
+                font-size: 3rem;
+            }
+            
+            .stats-container {
+                margin: 1rem;
+            }
+        }
+    </style>
+
+{% endblock %}    
+
+{% block content %}
+    
+
+
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-avatar">
+            <i class="fas fa-user"></i>
+        </div>
+        <h1 class="text-center mb-3">
+            <i class="fas fa-star me-2"></i>
+            {{ user.full_name or 'User Profile' }}
+        </h1>
+        <p class="text-center text-light opacity-75">
+            <i class="fas fa-clock me-2"></i>
+            Last updated: {{ user.updated_on.strftime('%B %d, %Y') if user.updated_on else 'Never' }}
+        </p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-container">
+        <div class="stat-card" style="animation-delay: 0.1s;">
+            <div class="stat-icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <h6>Email Status</h6>
+            <p class="text-success">
+                <i class="fas fa-check-circle me-1"></i>
+                Verified
+            </p>
+        </div>
+        <div class="stat-card" style="animation-delay: 0.2s;">
+            <div class="stat-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h6>Account Security</h6>
+            <p class="text-info">
+                <i class="fas fa-lock me-1"></i>
+                Protected
+            </p>
+        </div>
+        <div class="stat-card" style="animation-delay: 0.3s;">
+            <div class="stat-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h6>Profile Completion</h6>
+            <p class="text-warning">
+                <i class="fas fa-percentage me-1"></i>
+                85% Complete
+            </p>
+        </div>
+    </div>
+
+
+    <!-- Profile Form -->
+    <div class="form-container">
+        <h2 class="text-center mb-4">
+            <i class="fas fa-edit me-2"></i>
+            Edit Profile Information
+        </h2>
+        
+<form method="POST" id="profileForm">
+    <!-- Existing User Fields -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-label"><i class="fas fa-user"></i> Full Name</label>
+                <input type="text" class="form-control" name="full_name" value="{{ user.full_name or '' }}" placeholder="Enter your full name" required>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-label"><i class="fas fa-envelope"></i> Email Address</label>
+                <input type="email" class="form-control" name="email" value="{{ user.email or '' }}" placeholder="Enter your email address" required>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-label"><i class="fas fa-phone"></i> Phone Number</label>
+                <input type="tel" class="form-control" name="phone" value="{{ user.phone or '' }}" placeholder="Enter your phone number">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-label"><i class="fas fa-lock"></i> New Password (Optional)</label>
+                <input type="password" class="form-control" name="new_password" placeholder="Enter new password">
+            </div>
+        </div>
+    </div>
+
+    <!-- Vehicle and Address Fields -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-label"><i class="fas fa-car"></i> Plate Number</label>
+                <input type="text" class="form-control" name="plate_number" value="{{ vehicle.plate_number or '' }}" placeholder="Enter vehicle plate number" required>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-label"><i class="fas fa-car-side"></i> Vehicle Type</label>
+                <input type="text" class="form-control" name="vehicle_type" value="{{ vehicle.vehicle_type or '' }}" placeholder="Enter vehicle type" required>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-label"><i class="fas fa-palette"></i> Color</label>
+                <input type="text" class="form-control" name="color" value="{{ vehicle.color or '' }}" placeholder="Enter vehicle color">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-label"><i class="fas fa-map-marker-alt"></i> Address</label>
+                <input type="text" class="form-control" name="address" value="{{ address.address or '' }}" placeholder="Enter your address" required>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="form-label"><i class="fas fa-city"></i> City</label>
+                <input type="text" class="form-control" name="city" value="{{ address.city or '' }}" placeholder="Enter city" required>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="form-label"><i class="fas fa-flag"></i> State</label>
+                <input type="text" class="form-control" name="state" value="{{ address.state or '' }}" placeholder="Enter state" required>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="form-label"><i class="fas fa-mail-bulk"></i> Pincode</label>
+                <input type="text" class="form-control" name="pincode" value="{{ address.pincode or '' }}" placeholder="Enter pincode" required>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="form-label"><i class="fas fa-landmark"></i> Landmark</label>
+                <input type="text" class="form-control" name="landmark" value="{{ address.landmark or '' }}" placeholder="Enter landmark (optional)">
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Button and Loading Animation (as before) -->
+    <div class="loading" id="loadingAnimation">
+        <div class="spinner"></div>
+        <p class="mt-2 text-muted">Updating profile...</p>
+    </div>
+    <div class="text-center mt-4">
+        <button type="submit" class="btn btn-animated me-3">
+            <i class="fas fa-save me-2"></i>
+            Update Profile
+        </button>
+        <a href="{{ url_for('user.user_info') }}" class="btn btn-secondary-animated">
+            <i class="fas fa-arrow-left me-2"></i>
+            Back to Dashboard
+        </a>
+    </div>
+</form>
+
+    </div>
+{% endblock %}
+
+{% block script %}
+    
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Form submission with loading animation
+        document.getElementById('profileForm').addEventListener('submit', function() {
+            document.getElementById('loadingAnimation').style.display = 'block';
+            document.querySelector('button[type="submit"]').disabled = true;
+        });
+        
+        // Add floating animation to form inputs on focus
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // Particle animation enhancement
+        function createParticles() {
+            const particles = document.querySelector('.bg-particles');
+            
+            for(let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.top = Math.random() * 100 + '%';
+                    particle.style.width = (Math.random() * 60 + 40) + 'px';
+                    particle.style.height = particle.style.width;
+                    particle.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                    particles.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 8000);
+                }, i * 1000);
+            }
+        }
+        
+        // Initialize particles
+        createParticles();
+        setInterval(createParticles, 8000);
+    </script>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'layout.html' %}
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <style>
+        .card{
+            background-color: #0b1327;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 booking-container">
+    <div class="card shadow-sm animate-fadein">
+        <div class="card-header bg-gradient-primary text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-bookmark me-2"></i>Book Parking Spot
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="text-center mb-4 text-light">
+                <h4>{{ lot.name }}</h4>
+                <p class="text-light">
+                    {{ lot.address.address }}, {{ lot.address.city }} - {{ lot.address.pincode }}
+                </p>
+                <p class="price-badge fs-5">₹{{ lot.price_per_hour }}/hour</p>
+            </div>
+            
+            <form method="post">
+                <<div class="mb-3">
+                    <label class="form-label">Select Parking Spot</label>
+                    <select class="form-select bg-dark text-white" name="spot_id" required>
+                        <option value="">-- Choose Available Spot --</option>
+                        {% for spot in spots %}
+                            <option value="{{ spot.id }}" {% if spot.id == (selected_spot_id or '') %}selected{% endif %}>
+                                Spot {{ spot.spot_number }} (ID: {{ spot.id }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                
+                <!-- Vehicle and Address Fields -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-car"></i> Plate Number</label>
+                            <input type="text" class="form-control" name="plate_number" value="{{ vehicle.plate_number or '' }}" placeholder="Enter vehicle plate number" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-car-side"></i> Vehicle Type</label>
+                            <input type="text" class="form-control" name="vehicle_type" value="{{ vehicle.vehicle_type or '' }}" placeholder="Enter vehicle type" required>
+                        </div>
+                    </div>
+                </div>
+               
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-check-circle me-2"></i>Confirm Booking
+                    </button>
+                    <a href="{{ url_for('user.new_booking') }}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,110 @@
+<!-- templates/user/release.html -->
+{% extends "layout.html" %}
+
+{% block style %}
+<style>
+    body {
+        background-color: #070f28;
+    }
+    .release-container {
+        background: #1c2236;
+        border-radius: 18px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        margin-top: 2rem;
+    }
+    .form-control {
+        background-color: #2a3142;
+        border: 1px solid #3d4758;
+        color: #e0e6f3;
+    }
+    .form-control:focus {
+        background-color: #2a3142;
+        border-color: #070808;
+        color: #e0e6f3;
+        box-shadow: 0 0 0 0.2rem rgba(43, 61, 81, 0.25);
+    }
+    .form-label {
+        color: #dcdee0;
+        font-weight: 500;
+    }
+
+input[readonly],
+input:disabled,
+textarea:disabled,
+textarea[readonly] {
+    background-color: #2a3142 !important;
+    color: #e0e6f3 !important;
+    opacity: 1 !important;
+    border: 1px solid #3d4758;
+    transition: background-color 0.2s ease;
+}
+
+/* Darker background on hover */
+input[readonly]:hover,
+input:disabled:hover,
+textarea:disabled:hover,
+textarea[readonly]:hover {
+    background-color: #1f2633 !important;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="release-container">
+        <div class="text-center mb-4">
+            <h3 class="text-light">
+                <i class="fas fa-sign-out-alt me-2 text-warning"></i>
+                Release the parking spot
+            </h3>
+        </div>
+        
+        <form method="POST">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Spot_ID :</label>
+                    <input type="text" class="form-control" 
+                           value="{{ reservation.spot.spot_number }}" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Vehicle Number :</label>
+                    <input type="text" class="form-control" 
+                           value="{{ reservation.vehicle_plate }}" readonly>
+                </div>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Parking time :</label>
+                    <input type="text" class="form-control" 
+                           value="{{ reservation.start_time.strftime('%Y-%m-%d %H:%M') }}" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Releasing time :</label>
+                    <input type="text" class="form-control" 
+                           value="{{ current_time.strftime('%Y-%m-%d %H:%M') }}" readonly>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">Total cost :</label>
+                    <input type="text" class="form-control" 
+                           value="₹{{ estimated_cost }}" readonly>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-check-circle me-2"></i>Release
+                </button>
+                <a href="{{ url_for('user.history') }}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-times-circle me-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
