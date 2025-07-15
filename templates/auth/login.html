@@ -1,0 +1,286 @@
+{% extends 'layout.html' %}
+
+{% block style %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: rgb(1, 14, 20);
+            font-family: 'Inter', sans-serif;
+            color: #e8eaf6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .login-container {
+            width: 900px;
+            max-width: 98vw;
+            background: rgba(2, 4, 21, 0.7);
+            border-radius: 22px;
+            box-shadow: 0 10px 40px 0 rgba(30, 10, 50, 0.6);
+            display: flex;
+            overflow: hidden;
+            margin: 40px auto;
+            position: relative;
+            animation: fadeInUp 1s;
+        }
+        .login-left {
+            flex: 1.4;
+            padding: 48px 36px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: rgba(3, 8, 30, 0.82);
+            backdrop-filter: blur(14px);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .navbar-custom {
+            background: transparent;
+            padding: 0 32px;
+            margin-bottom: 24px;
+        }
+        .navbar-custom .navbar-brand {
+            color: #e8eaf6 !important;
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+        .login-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #0e0e10, #164d79);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 36px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: avatarPulse 3s ease-in-out infinite;
+        }
+        .login-avatar svg {
+            width: 40px;
+            height: 40px;
+            stroke: #e8eaf6;
+            stroke-width: 2;
+            animation: iconBounce 2s ease-in-out infinite;
+        }
+        @keyframes avatarPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(63,81,181,0.2);}
+            50% { box-shadow: 0 0 0 10px rgba(63,81,181,0.08);}
+        }
+        @keyframes iconBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .login-form .form-group {
+            margin-bottom: 2rem;
+        }
+        .login-form .form-label {
+            color: #c5cae9;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .login-form .form-control {
+            background: rgba(15, 20, 25, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            color: #e8eaf6;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .login-form .form-control:focus {
+            background: rgba(15,20,25,0.9);
+            box-shadow: 0 0 0 0.2rem rgba(63,81,181,0.25), inset 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+        .login-form .form-control::placeholder {
+            color: rgba(200,200,200,0.6);
+        }
+        .btn-login {
+            background: linear-gradient(45deg, #071116, #244968);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 5px rgba(11, 11, 15, 0.4);
+            cursor: pointer;
+        }
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        .btn-login:hover::before {
+            left: 100%;
+        }
+        .btn-login:hover {
+            transform: translateY(-3px);
+            color: #e8eaf6;
+            box-shadow: 0 5px 5px rgba(61, 61, 63, 0.4);
+        }
+        .login-right {
+            flex: 1.6;
+            position: relative;
+            background: #0a1520;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 48px 48px 48px 36px;
+            overflow: hidden;
+        }
+        .neon-bg {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVrjuhJtTB8RLqza2Yq1qe7ngaULRGI1b3TA&s') no-repeat center center;
+            background-size: cover;
+            filter: brightness(0.22) blur(2.5px);
+            opacity: 0.85;
+        }
+        .welcome-content {
+            position: relative;
+            z-index: 2;
+            color: #e8eaf6;
+            max-width: 380px;
+            margin-top: 60px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.08);
+        }
+        .welcome-content h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 18px;
+            color: #e8eaf6;
+            text-shadow: 0 0 12px #0e223544;
+        }
+        .welcome-content p {
+            color: #c5cae9;
+            font-size: 1.1rem;
+            margin-bottom: 32px;
+        }
+        .welcome-content a {
+            color: #bfc7f3;
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+        .welcome-content a:hover {
+            color: #3f51b5;
+        }
+        @media (max-width: 900px) {
+            .login-container {
+                flex-direction: column;
+                width: 98vw;
+                margin-top: 40px;
+                margin-bottom: 40px;
+            }
+            .login-right,
+            .login-left {
+                padding: 32px 16px;
+            }
+        }
+        @media (max-width: 600px) {
+            .welcome-content h1 {
+                font-size: 2rem;
+            }
+            .login-container {
+                border-radius: 0;
+            }
+        }
+        @media (max-height: 700px) {
+            .login-container {
+                position: static;
+                margin-top: 40px;
+                margin-bottom: 40px;
+            }
+        }
+        @keyframes fadeInUp {
+            0% {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="login-container">
+        <div class="login-left">
+            <nav class="navbar navbar-expand navbar-custom mb-4">
+                <a class="navbar-brand" href="#"><b>P</b>SmartPark</a>
+            </nav>
+            <div class="login-avatar">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 20c0-4 8-4 8-4s8 0 8 4" />
+                </svg>
+            </div>
+            <form method="POST" action="{{ url_for('auth.login_post') }}" class="login-form">
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        <i class="fa fa-envelope"></i> EMAIL
+                    </label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        <i class="fa fa-lock"></i> PASSWORD
+                    </label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-login px-5">LOGIN</button>
+                </div>
+            </form>
+        </div>
+        <div class="login-right">
+            <div class="neon-bg"></div>
+            <div class="welcome-content">
+                <h1>Welcome Back!</h1>
+                <p>
+                    Glad to see you again at <b>SmartPark</b>.<br>
+                    Log in to access your personalized dashboard, manage your vehicles, and enjoy seamless parking experiences.
+                </p>
+                <ul style="list-style:none; padding-left:0; margin-bottom:2rem;">
+                    <li style="margin-bottom:0.7em; color:#bfc7f3;">
+                        <i class="fa fa-check-circle" style="color:#6ec6ff;"></i> Quick spot reservations
+                    </li>
+                    <li style="margin-bottom:0.7em; color:#bfc7f3;">
+                        <i class="fa fa-check-circle" style="color:#6ec6ff;"></i> View & manage your bookings
+                    </li>
+                    <li style="margin-bottom:0.7em; color:#bfc7f3;">
+                        <i class="fa fa-check-circle" style="color:#6ec6ff;"></i> Secure & reliable platform
+                    </li>
+                </ul>
+                <div class="text-white-50" style="font-size:0.95rem;">
+                    Not a member? <a href="{{ url_for('auth.register') }}">Sign up now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

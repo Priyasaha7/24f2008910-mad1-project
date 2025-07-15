@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register | SmartPark</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap & FontAwesome -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            background: rgb(1, 14, 20);
+            font-family: 'Inter', sans-serif;
+            color: #e8eaf6;
+        }
+        .register-container {
+            display: flex;
+            width: 960px;
+            max-width: 98vw;
+            background: rgba(2, 4, 21, 0.7);
+            border-radius: 22px;
+            box-shadow: 0 10px 40px 0 rgba(30, 10, 50, 0.6);
+            margin: 60px auto;
+            overflow: hidden;
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            animation: fadeIn 0.6s ease-out;
+        }
+        .register-left,
+        .register-right {
+            padding: 48px;
+        }
+        .register-left {
+            flex: 1.4;
+            background: rgba(3, 8, 30, 0.82);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .register-right {
+            flex: 1.6;
+            position: relative;
+            background: #0a1520;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .neon-bg {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVrjuhJtTB8RLqza2Yq1qe7ngaULRGI1b3TA&s') no-repeat center center;
+            background-size: cover;
+            filter: brightness(0.22) blur(2.5px);
+            opacity: 0.85;
+        }
+        .register-form .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .register-form .form-control {
+            background: rgba(15, 20, 25, 0.8);
+            border-radius: 12px;
+            color: #e8eaf6;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+            border: none;
+        }
+        .register-form .form-control:focus {
+            background: rgba(15, 20, 25, 0.9);
+            box-shadow: 0 0 0 0.2rem rgba(63, 81, 181, 0.25), inset 0 2px 10px rgba(0, 0, 0, 0.3);
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+        .register-form .form-control::placeholder {
+            color: rgba(200, 200, 200, 0.6);
+        }
+        .register-form label {
+            font-weight: 500;
+            color: #c5cae9;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-register {
+            background: linear-gradient(45deg, #071116, #244968);
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 5px rgba(11, 11, 15, 0.4);
+            cursor: pointer;
+        }
+        .btn-register:hover {
+            background: linear-gradient(45deg, #244968, #071116);
+            transform: translateY(-3px);
+            color: #e8eaf6;
+            box-shadow: 0 5px 5px rgba(61, 61, 63, 0.4);
+        }
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 38px;
+            color: #ccc;
+            cursor: pointer;
+        }
+        .flash-msg {
+            color: #ff4c4c;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .welcome-content {
+            text-align: left;
+            max-width: 400px;
+            z-index: 2;
+            position: relative;
+        }
+        .welcome-content h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #e8eaf6;
+            margin-bottom: 1.2rem;
+        }
+        .welcome-content p {
+            font-size: 1.08rem;
+            color: #c5cae9;
+            margin-top: 16px;
+            margin-bottom: 2.2rem;
+            line-height: 1.6;
+        }
+        .welcome-content .features-list {
+            margin-bottom: 2rem;
+            padding-left: 0;
+            list-style: none;
+        }
+        .welcome-content .features-list li {
+            font-size: 1rem;
+            color: #bfc7f3;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7em;
+        }
+        .welcome-content .features-list i {
+            color: #6ec6ff;
+            font-size: 1.1em;
+        }
+        .welcome-content .text-muted a {
+            color: #bfc7f3;
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+        .welcome-content .text-muted a:hover {
+            color: #3f51b5;
+        }
+        @media (max-width: 900px) {
+            .register-container {
+                flex-direction: column;
+            }
+            .register-left,
+            .register-right {
+                padding: 32px;
+            }
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="register-container">
+        <div class="register-left">
+            <h2 class="text-center mb-4">Create an Account</h2>
+            <form method="POST" action="{{ url_for('auth.register_post') }}" class="register-form" onsubmit="return validatePasswords();">
+                <div class="form-group">
+                    <label for="full_name">
+                        <i class="fa fa-user"></i>
+                        Full Name
+                    </label>
+                    <input type="text" class="form-control" id="full_name" name="full_name" placeholder="Enter full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fa fa-envelope"></i>
+                        Email
+                    </label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">
+                        <i class="fa fa-phone"></i>
+                        Phone
+                    </label>
+                    <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter phone number">
+                </div>
+                <div class="form-group position-relative">
+                    <label for="password">
+                        <i class="fa fa-lock"></i>
+                        Password
+                    </label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                    <i class="fa fa-eye toggle-password" onclick="togglePassword('password', this)"></i>
+                </div>
+                <div class="form-group position-relative">
+                    <label for="confirm_password">
+                        <i class="fa fa-lock"></i>
+                        Confirm Password
+                    </label>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
+                    <i class="fa fa-eye toggle-password" onclick="togglePassword('confirm_password', this)"></i>
+                </div>
+                <div class="form-check mb-3">
+                    <input type="checkbox" class="form-check-input" id="rememberMe">
+                    <label class="form-check-label" for="rememberMe">Remember me</label>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-register px-5">Register</button>
+                </div>
+            </form>
+        </div>
+        <div class="register-right">
+            <div class="neon-bg"></div>
+            <div class="welcome-content">
+                <h1>Welcome to SmartPark</h1>
+                <p>
+                    Join India's most advanced parking management platform.<br>
+                    Register now and unlock a smarter, faster, and more secure way to park!
+                </p>
+                <ul class="features-list">
+                    <li><i class="fa fa-check-circle"></i> Real-time spot availability</li>
+                    <li><i class="fa fa-check-circle"></i> Quick, secure reservations</li>
+                    <li><i class="fa fa-check-circle"></i> Manage your vehicles easily</li>
+                    <li><i class="fa fa-check-circle"></i> Instant booking history access</li>
+                </ul>
+                <div class="text-muted" style="font-size:0.95rem;">
+                    Already a member? <a href="{{ url_for('auth.login') }}">Sign in now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Toggle Script -->
+    <script>
+        function togglePassword(fieldId, icon) {
+            const input = document.getElementById(fieldId);
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            icon.classList.toggle('fa-eye-slash');
+            icon.classList.toggle('fa-eye');
+        }
+
+        function validatePasswords() {
+            const pass = document.getElementById('password').value;
+            const confirm = document.getElementById('confirm_password').value;
+            if (pass !== confirm) {
+                alert('Passwords do not match');
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>
