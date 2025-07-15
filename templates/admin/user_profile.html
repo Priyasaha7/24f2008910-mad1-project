@@ -1,0 +1,161 @@
+{% extends 'layout.html' %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<style>
+    .card.table-card {
+        max-width: 800px;  /* Increased width */
+        margin: 2rem auto;
+        background: var(--bg-card);
+        border-radius: var(--border-radius);
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+        color: var(--text-main);
+    }
+    .profile-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin-right: 0.5rem;
+        min-width: 110px;
+        display: inline-block;
+    }
+    .btn-back {
+        color: var(--text-secondary);
+        background: none;
+        border: none;
+        font-weight: 500;
+        text-decoration: underline;
+        transition: color 0.2s;
+        margin-bottom: 1rem;
+    }
+    .btn-back:hover {
+        color: var(--accent-2);
+        text-decoration: underline;
+    }
+    .info-section {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        border-left: 3px solid var(--accent-1);
+    }
+    .section-title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        color: var(--accent-1);
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .detail-row {
+        margin-bottom: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block title %}
+<title>User Profile - Admin</title>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h2 class="page-title"><i class="fas fa-user"></i> User Profile</h2>
+    <p class="page-subtitle">View user details and activity</p>
+</div>
+
+<div class="card table-card animate-fadein">
+    <div class="card-body">
+        <a href="{{ url_for('admin.manage_users') }}" class="btn-back">
+            <i class="fas fa-arrow-left me-2"></i>Back to User List
+        </a>
+        
+        <div class="mb-4">
+            <h4>{{ user.full_name }}</h4>
+            <div class="d-flex align-items-center mt-2">
+                <span class="badge bg-{{ 'success' if user.is_admin else 'secondary' }} me-2">
+                    {{ 'Admin' if user.is_admin else 'User' }}
+                </span>
+                <span>
+                    <i class="fas fa-calendar me-1"></i>
+                    Joined {{ user.registered_on.strftime('%b %d, %Y') }}
+                </span>
+            </div>
+        </div>
+
+        <!-- User Information Section -->
+        <div class="info-section">
+            <h5 class="section-title">
+                <i class="fas fa-id-card me-2"></i>Account Information
+            </h5>
+            <div class="detail-row">
+                <span class="profile-label">Email:</span>
+                {{ user.email }}
+            </div>
+            <div class="detail-row">
+                <span class="profile-label">Phone:</span>
+                {{ user.phone or '-' }}
+            </div>
+        </div>
+
+        <!-- Vehicle Information -->
+        <div class="info-section">
+            <h5 class="section-title">
+                <i class="fas fa-car me-2"></i>Vehicle Details
+            </h5>
+            {% if vehicle %}
+                <div class="detail-row">
+                    <span class="profile-label">Plate Number:</span>
+                    {{ vehicle.plate_number }}
+                </div>
+                <div class="detail-row">
+                    <span class="profile-label">Vehicle Type:</span>
+                    {{ vehicle.vehicle_type }}
+                </div>
+                <div class="detail-row">
+                    <span class="profile-label">Color:</span>
+                    {{ vehicle.color or '-' }}
+                </div>
+            {% else %}
+                <div class="text-center py-3">
+                    <i class="fas fa-car fa-2x mb-2"></i>
+                    <p>No vehicle registered</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Address Information -->
+        <div class="info-section">
+            <h5 class="section-title">
+                <i class="fas fa-map-marker-alt me-2"></i>Address Details
+            </h5>
+            {% if address %}
+                <div class="detail-row">
+                    <span class="profile-label">Address:</span>
+                    {{ address.address }}
+                </div>
+                <div class="detail-row">
+                    <span class="profile-label">City:</span>
+                    {{ address.city }}
+                </div>
+                <div class="detail-row">
+                    <span class="profile-label">State:</span>
+                    {{ address.state }}
+                </div>
+                <div class="detail-row">
+                    <span class="profile-label">Pincode:</span>
+                    {{ address.pincode }}
+                </div>
+                <div class="detail-row">
+                    <span class="profile-label">Landmark:</span>
+                    {{ address.landmark or '-' }}
+                </div>
+            {% else %}
+                <div class="text-center py-3">
+                    <i class="fas fa-map-marker-alt fa-2x mb-2"></i>
+                    <p>No address registered</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
