@@ -1,0 +1,205 @@
+    body{
+        background-color: #040d1c;
+    }
+
+    .form-control::placeholder {
+        color: #b0b0b0;
+    }
+
+    :root {
+    --bg-main: hsl(218, 75%, 6%);
+    --bg-card: #03081bd4;
+    --bg-gradient-primary: linear-gradient(135deg, #080e14 0%, #000306 100%);
+    --text-main: #e0e6f3;
+    --text-secondary: #b0b0b0;
+    --accent: #c8c8c9;
+    --accent-2: #00e5ff;
+    --table-header: #031725;
+    --modal-bg: #01040f;
+    --border-radius: 18px;
+    }
+
+    .lots-container {
+        background: var(--bg-main);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .dashboard-header {
+        background: linear-gradient(135deg, rgba(5, 27, 45, 0.9) 0%, rgba(4, 10, 49, 0.9) 100%);
+        backdrop-filter: blur(20px);
+        border-radius: 25px;
+        margin: 2rem auto;
+        max-width: 1400px;
+        padding: 2rem;
+        animation: slideInFromTop 0.8s ease-out;
+    }
+
+    .page-title {
+        font-weight: 700;
+        color: #a7a7b5;
+        margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+        color: #c5cae9;
+        margin-bottom: 0;
+    }
+
+    .stat-card {
+        background: rgba(2, 4, 30, 0.6);
+        backdrop-filter: blur(15px);
+        border-radius: 20px;
+        padding: 1.5rem;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,0.1);
+        transition: all 0.3s;
+        animation: fadeInUp 0.6s;
+    }
+    .stat-card:hover { 
+        transform: translateY(-5px); 
+        box-shadow: 0 5px 20px rgba(63,81,181,0.3);
+    }
+
+    .stat-icon { 
+        font-size: 2.5rem; 
+        margin-bottom: 1rem; 
+        animation: iconFloat 3s ease-in-out infinite;
+    }
+    .stat-icon.users { color: #31708d;}
+    .stat-icon.lots { color: #66bb6a;}
+    .stat-icon.spots { color: #a96908;}
+    .stat-icon.active { color: #ef5350;}
+
+    .stat-value { 
+        font-size: 2rem; 
+        font-weight: 700; 
+        color: #e8eaf6; 
+        margin: 0.5rem 0;
+    }
+    .stat-label { 
+        color: #f3f4f9; 
+        font-size: 1rem;
+    }
+
+    .table-card {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: var(--bg-card);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: var(--border-radius);
+    }
+
+    .card-header.bg-gradient-primary {
+        background: var(--bg-gradient-primary) !important;
+    }
+
+    .lots-table {
+        background: var(--bg-card);
+        color: var(--text-main);
+        border-radius: var(--border-radius);
+    }
+    .lots-table th {
+        background: var(--table-header) !important;
+        color: var(--accent);
+        border: none;
+        font-weight: 600;
+    }
+    .lots-table td {
+        border-top: 1px solid #222a3a;
+        vertical-align: middle;
+    }
+    .table-hover tbody tr:hover {
+        background: #263040;
+        transition: background 0.3s;
+    }
+
+    .address-info div {
+        color: var(--text-main);
+    }
+    .address-info small {
+        color: var(--text-secondary);
+    }
+
+    .price-badge {
+        background: #66bb6a;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .btn-edit, .btn-delete {
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    .btn-edit:hover { 
+        transform: scale(1.1); 
+        box-shadow: 0 4px 12px rgba(255,193,7,0.3);
+    }
+    .btn-delete:hover { 
+        transform: scale(1.1); 
+        box-shadow: 0 4px 12px rgba(220,53,69,0.3);
+    }
+
+    .btn-add-lot {
+        background: linear-gradient(45deg, #12161e, #082943);
+        border: none;
+        border-radius: 15px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .btn-add-lot:hover {
+        transform: translateY(-2px);
+    }
+
+    .form-control {
+        background: hsla(205, 17%, 62%, 0.151);
+        border: 1px solid #121418;
+        color: var(--text-main);
+        border-radius: 10px;
+        transition: all 0.3s;
+    }
+    .form-control:focus {
+        background: #091125;
+        border-color: var(--accent);
+        color: #fff;
+        box-shadow: 0 0 0 0.2rem rgba(19, 26, 29, 0.25);
+    }
+
+    .form-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-secondary);
+    }
+
+    @keyframes slideInFromTop {
+        0% { transform: translateY(-50px); opacity: 0;}
+        100% { transform: translateY(0); opacity: 1;}
+    }
+    @keyframes fadeInUp { 
+        0% { transform: translateY(30px); opacity: 0;} 
+        100% { transform: translateY(0); opacity: 1;}
+    }
+    @keyframes iconFloat { 
+        0%,100% { transform: translateY(0px);} 
+        50% { transform: translateY(-8px);}
+    }
+    .animate-fadein { animation: fadeInUp 1s; }
+
+    @media (max-width: 768px) {
+        .dashboard-header { margin: 1rem; padding: 1.5rem;}
+        .action-buttons { flex-direction: column;}
+        .lots-table { font-size: 0.875rem;}
+    }
