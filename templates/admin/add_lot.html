@@ -1,0 +1,60 @@
+{% extends 'layout.html' %}
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container lots-container">
+    <div class="dashboard-header mb-4">
+        <h2 class="page-title"><i class="fas fa-plus me-2"></i>Add New Parking Lot</h2>
+    </div>
+    <div class="card table-card animate-fadein p-4">
+        <form method="post">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Prime Location Name</label>
+                    <input type="text" class="form-control" name="name" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Pin code</label>
+                    <input type="text" class="form-control" name="pincode" maxlength="6" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Address</label>
+                <textarea class="form-control" name="address" rows="3" required></textarea>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">City</label>
+                    <input type="text" class="form-control" name="city" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">State</label>
+                    <input type="text" class="form-control" name="state" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Price(per hour)</label>
+                    <input type="number" class="form-control" name="price_per_hour" step="0.01" min="0" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Maximum spots</label>
+                    <input type="number" class="form-control" name="max_spots" min="1" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Landmark (Optional)</label>
+                <input type="text" class="form-control" name="landmark">
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add
+                </button>
+                <a href="{{ url_for('admin.view_lots') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

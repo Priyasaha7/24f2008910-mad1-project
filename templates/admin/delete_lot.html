@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container lots-container">
+    <div class="dashboard-header mb-4">
+        <h2 class="page-title text-danger"><i class="fas fa-trash me-2"></i>Delete Parking Lot</h2>
+    </div>
+    <div class="card table-card animate-fadein p-4">
+        <div class="text-center mb-4">
+            <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+            <h4 class="text-light">Are you sure you want to delete <span class="fw-bold text-warning">{{ lot.name }}</span>?</h4>
+            <p class="text-light">This action cannot be undone.</p>
+        </div>
+        <form method="post">
+            <div class="d-flex justify-content-center gap-2">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash me-2"></i>Delete
+                </button>
+                <a href="{{ url_for('admin.view_lots') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

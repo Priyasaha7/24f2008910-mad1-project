@@ -1,0 +1,147 @@
+{% extends 'layout.html' %}
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+
+{% set available_counts = [] %}
+{% for lot in lots %}
+    {% if lot.spots %}
+        {% set count = lot.spots | selectattr('status', 'equalto', 'A') | list | length %}
+        {% set _ = available_counts.append(count) %}
+    {% else %}
+        {% set _ = available_counts.append(0) %}
+    {% endif %}
+{% endfor %}
+{% set total_available = available_counts | sum %}
+
+
+<div class="container-fluid lots-container">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="page-title">
+                    <i class="fas fa-building me-3"></i>Parking Lots Management
+                </h2>
+                <p class="page-subtitle">Manage all parking locations and configurations</p>
+            </div>
+            <a href="{{ url_for('admin.add_lot') }}" class="btn btn-primary btn-add-lot">
+                <i class="fas fa-plus me-2"></i>Add New Lot
+            </a>
+        </div>
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card animate-fadein" style="animation-delay: 0.1s;">
+                    <div class="stat-icon lots"><i class="fas fa-building"></i></div>
+                    <div class="stat-value">{{ lots|length }}</div>
+                    <div class="stat-label">Total Lots</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card animate-fadein" style="animation-delay: 0.2s;">
+                    <div class="stat-icon spots"><i class="fas fa-parking"></i></div>
+                    <div class="stat-value">
+                        {{ lots|sum(attribute='max_spots') }}
+                    </div>
+                    <div class="stat-label">Total Capacity</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card animate-fadein" style="animation-delay: 0.3s;">
+                    <div class="stat-icon active"><i class="fas fa-car"></i></div>
+                    <div class="stat-value">
+                        {{ total_available }}
+                    </div>
+                    <div class="stat-label">Available Spots</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card animate-fadein" style="animation-delay: 0.4s;">
+                    <div class="stat-icon users"><i class="fas fa-inr"></i></div>
+                    <div class="stat-value">
+                        {% if lots|length > 0 %}
+                            ₹{{ "%.2f"|format(lots|sum(attribute='price_per_hour')/lots|length) }}
+                        {% else %}
+                            ₹0.00
+                        {% endif %}
+                    </div>
+                    <div class="stat-label">Avg. Price/Hour</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lots Table -->
+    <div class="card shadow-sm table-card animate-fadein">
+        <div class="card-header bg-gradient-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-list me-2"></i>All Parking Lots</h5>
+        </div>
+        <div class="card-body p-0">
+            {% if lots %}
+            <div class="table-responsive">
+                <table class="table table-dark table-hover lots-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>Price/Hour</th>
+                            <th>Max Spots</th>
+                            <th>Available</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for lot in lots %}
+                        <tr class="lot-row" data-lot-id="{{ lot.id }}">
+                            <td><span class="badge bg-info">{{ lot.id }}</span></td>
+                            <td class="fw-bold text-warning">{{ lot.name }}</td>
+                            <td>
+                                <div class="address-info">
+                                    <div>{{ lot.address.address }}</div>
+                                    <small>{{ lot.address.city }}, {{ lot.address.pincode }}</small>
+                                </div>
+                            </td>
+                            <td><span class="price-badge">₹{{ lot.price_per_hour }}</span></td>
+                            <td><span class="badge bg-secondary">{{ lot.max_spots }}</span></td>
+                            <td>
+                                <span class="badge bg-success">
+                                    {% if lot.spots %}
+                                        {{ lot.spots|selectattr('status', 'equalto', 'A')|list|length }}
+                                    {% else %}
+                                        0
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ url_for('admin.edit_lot', lot_id=lot.id) }}" class="btn btn-warning btn-sm btn-edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url_for('admin.delete_lot', lot_id=lot.id) }}" class="btn btn-danger btn-sm btn-delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-building fa-3x mb-3"></i>
+                <h4>No Parking Lots Found</h4>
+                <p>Create your first parking lot to get started.</p>
+                <a href="{{ url_for('admin.add_lot') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add New Lot
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
